@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/mobile.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ShopKart</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f1f3f6; min-height: 100vh; }
+        .navbar { background: #2874f0; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .logo { color: white; font-size: 24px; font-weight: bold; cursor: pointer; }
+        .logo span { color: #ffe082; }
+        .container { max-width: 900px; margin: 40px auto; padding: 0 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); min-height: 500px; }
+        .left-panel { background: linear-gradient(135deg, #1a237e, #2874f0); padding: 48px 40px; display: flex; flex-direction: column; justify-content: center; color: white; }
+        .left-panel h2 { font-size: 28px; font-weight: bold; margin-bottom: 16px; }
+        .left-panel p { font-size: 14px; opacity: 0.85; line-height: 1.7; margin-bottom: 24px; }
+        .benefit { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; font-size: 14px; }
+        .benefit-icon { font-size: 24px; }
+        .right-panel { padding: 48px 40px; }
+        .tab-btns { display: flex; margin-bottom: 32px; border-bottom: 2px solid #f1f3f6; }
+        .tab-btn { flex: 1; padding: 12px; background: none; border: none; font-size: 15px; font-weight: bold; cursor: pointer; color: #878787; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+        .tab-btn.active { color: #2874f0; border-bottom-color: #2874f0; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: bold; color: #212121; margin-bottom: 6px; }
+        .form-group input { width: 100%; padding: 12px 14px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+        .form-group input:focus { border-color: #2874f0; }
+        .submit-btn { width: 100%; background: #2874f0; color: white; border: none; padding: 14px; font-size: 15px; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 8px; transition: background 0.2s; }
+        .submit-btn:hover { background: #1a5dc8; }
+        .error-msg { background: #ffebee; color: #c62828; padding: 10px 14px; border-radius: 4px; font-size: 13px; margin-bottom: 16px; display: none; }
+        .success-msg { background: #e8f5e9; color: #2e7d32; padding: 10px 14px; border-radius: 4px; font-size: 13px; margin-bottom: 16px; display: none; }
+        .form-page { display: none; }
+        .form-page.active { display: block; }
+        @media (max-width: 700px) { .container { grid-template-columns: 1fr; } .left-panel { display: none; } }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo" onclick="window.location.href='/'">Shop<span>Kart</span></div>
+</nav>
+
+<div class="container">
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+        <h2>Welcome to ShopKart!</h2>
+        <p>India's most trusted online shopping destination with millions of products.</p>
+        <div class="benefit"><span class="benefit-icon">🚚</span><span>Free delivery on orders above ₹499</span></div>
+        <div class="benefit"><span class="benefit-icon">↩️</span><span>Easy 7-day returns & exchanges</span></div>
+        <div class="benefit"><span class="benefit-icon">🔒</span><span>100% secure payments</span></div>
+        <div class="benefit"><span class="benefit-icon">💰</span><span>Best prices guaranteed</span></div>
+        <div class="benefit"><span class="benefit-icon">⭐</span><span>10 million+ happy customers</span></div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+        <div class="tab-btns">
+            <button class="tab-btn active" onclick="showTab('login')">Login</button>
+            <button class="tab-btn" onclick="showTab('register')">Register</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div class="form-page active" id="loginForm">
+            <div class="error-msg" id="loginError"></div>
+            <div class="success-msg" id="loginSuccess"></div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="loginEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password">
+            </div>
+            <button class="submit-btn" onclick="login()">Login to ShopKart</button>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div class="form-page" id="registerForm">
+            <div class="error-msg" id="registerError"></div>
+            <div class="success-msg" id="registerSuccess"></div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="regName" placeholder="Your full name">
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="regEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="regPhone" placeholder="10-digit mobile number">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" placeholder="Create a password">
+            </div>
+            <button class="submit-btn" onclick="register()">Create Account</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1)));
+        document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+        document.getElementById('registerForm').classList.toggle('active', tab === 'register');
+    }
+
+    async function login() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        if (!email || !password) { showError('loginError', 'Please fill all fields!'); return; }
+
+        const res = await fetch('/api/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            localStorage.setItem('shopkartUser', JSON.stringify(data.user));
+            showSuccess('loginSuccess', 'Login successful! Redirecting...');
+            setTimeout(() => window.location.href = '/', 1500);
+        } else {
+            showError('loginError', data.message);
+        }
+    }
+
+    async function register() {
+        const fullName = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const phone = document.getElementById('regPhone').value.trim();
+        const password = document.getElementById('regPassword').value.trim();
+        if (!fullName || !email || !phone || !password) { showError('registerError', 'Please fill all fields!'); return; }
+
+        const res = await fetch('/api/users/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fullName, email, phone, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showSuccess('registerSuccess', 'Account created! Please login.');
+            setTimeout(() => showTab('login'), 1500);
+        } else {
+            showError('registerError', data.message);
+        }
+    }
+
+    function showError(id, msg) {
+        const el = document.getElementById(id);
+        el.textContent = '❌ ' + msg;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 3000);
+    }
+
+    function showSuccess(id, msg) {
+        const el = document.getElementById(id);
+        el.textContent = '✅ ' + msg;
+        el.style.display = 'block';
+    }
+</script>
+</body>
+</html>

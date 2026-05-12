@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/mobile.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopKart - India's Best Online Store</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f1f3f6; }
+        .navbar { background: #2874f0; padding: 12px 20px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .logo { color: white; font-size: 24px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .logo span { color: #ffe082; font-style: italic; }
+        .logo small { font-size: 10px; color: #ffe082; display: block; font-style: italic; font-weight: normal; }
+        .search-bar { flex: 1; display: flex; border-radius: 4px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+        .search-bar input { flex: 1; padding: 10px 16px; border: none; outline: none; font-size: 14px; }
+        .search-bar button { background: #ff6161; color: white; border: none; padding: 10px 20px; cursor: pointer; font-size: 16px; }
+        .nav-actions { display: flex; align-items: center; gap: 8px; }
+        .nav-btn { background: white; color: #2874f0; border: none; padding: 8px 16px; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 13px; white-space: nowrap; transition: all 0.2s; }
+        .nav-btn:hover { background: #e3f2fd; }
+        .nav-btn.cart-btn { background: #ff9f00; color: white; }
+        .nav-btn.cart-btn:hover { background: #f57c00; }
+
+        /* HERO SLIDER */
+        .hero-slider { position: relative; overflow: hidden; height: 300px; }
+        .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s; display: flex; align-items: center; padding: 40px 60px; }
+        .slide.active { opacity: 1; }
+        .slide-1 { background: linear-gradient(135deg, #1a237e 0%, #2874f0 60%, #42a5f5 100%); }
+        .slide-2 { background: linear-gradient(135deg, #b71c1c 0%, #e53935 60%, #ef9a9a 100%); }
+        .slide-3 { background: linear-gradient(135deg, #1b5e20 0%, #388e3c 60%, #81c784 100%); }
+        .slide-4 { background: linear-gradient(135deg, #4a148c 0%, #7b1fa2 60%, #ce93d8 100%); }
+        .slide-content { color: white; z-index: 1; }
+        .slide-tag { background: rgba(255,255,255,0.2); display: inline-block; padding: 4px 12px; border-radius: 2px; font-size: 12px; letter-spacing: 1px; margin-bottom: 12px; }
+        .slide-title { font-size: 40px; font-weight: bold; line-height: 1.1; margin-bottom: 10px; }
+        .slide-sub { font-size: 16px; opacity: 0.85; margin-bottom: 20px; }
+        .slide-btn { background: white; color: #2874f0; border: none; padding: 12px 28px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .slide-emoji { position: absolute; right: 80px; font-size: 120px; opacity: 0.3; }
+        .slider-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.2s; }
+        .dot.active { background: white; width: 24px; border-radius: 4px; }
+        .slider-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; z-index: 2; }
+        .slider-arrow:hover { background: rgba(255,255,255,0.4); }
+        .arrow-left { left: 16px; }
+        .arrow-right { right: 16px; }
+
+        /* CATEGORY BAR */
+        .cat-bar { background: white; border-bottom: 1px solid #e0e0e0; overflow-x: auto; scrollbar-width: none; }
+        .cat-bar::-webkit-scrollbar { display: none; }
+        .cat-inner { display: flex; max-width: 1280px; margin: 0 auto; padding: 0 12px; }
+        .cat-item { display: flex; flex-direction: column; align-items: center; padding: 10px 20px; cursor: pointer; gap: 4px; font-size: 12px; font-weight: 500; white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .cat-item:hover, .cat-item.active { color: #2874f0; border-bottom-color: #2874f0; }
+        .cat-icon { font-size: 24px; }
+
+        /* SECTIONS */
+        .section { max-width: 1280px; margin: 16px auto; padding: 0 16px; }
+        .section-card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+        .section-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #f1f3f6; }
+        .section-head-left { display: flex; align-items: center; gap: 16px; }
+        .section-title { font-size: 20px; font-weight: bold; }
+        .timer { background: #ff6161; color: white; padding: 4px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; }
+        .view-all-btn { background: #2874f0; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
+
+        /* FLASH DEALS */
+        .h-products { display: flex; overflow-x: auto; scrollbar-width: none; padding: 16px 8px; }
+        .h-products::-webkit-scrollbar { display: none; }
+        .h-product-card { min-width: 170px; max-width: 170px; padding: 12px; border-right: 1px solid #f1f3f6; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .h-product-card:hover { background: #f5f8ff; }
+        .h-product-card:hover .h-img { transform: scale(1.05); }
+        .h-img-wrap { width: 100%; height: 130px; background: #f1f3f6; border-radius: 4px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
+        .h-img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; }
+        .h-name { font-size: 12px; font-weight: 500; margin-bottom: 4px; color: #212121; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .h-price { font-size: 14px; font-weight: bold; }
+        .h-discount { font-size: 11px; color: #388e3c; font-weight: bold; }
+        .h-original { font-size: 11px; color: #878787; text-decoration: line-through; }
+        .h-rating { background: #388e3c; color: white; font-size: 10px; padding: 1px 5px; border-radius: 2px; display: inline-block; margin-bottom: 4px; }
+
+        /* PROMO BANNERS */
+        .promo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .promo-card { border-radius: 8px; padding: 28px 24px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.08); position: relative; overflow: hidden; }
+        .promo-card:hover { transform: translateY(-2px); }
+        .promo-card h3 { font-size: 22px; font-weight: bold; color: white; margin-bottom: 6px; }
+        .promo-card p { font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 14px; }
+        .promo-btn { background: white; border: none; padding: 8px 20px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; }
+        .promo-emoji { position: absolute; right: 20px; bottom: 10px; font-size: 60px; opacity: 0.25; }
+
+        /* PRODUCT GRID */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 0; background: #e0e0e0; border: 1px solid #e0e0e0; border-top: none; }
+        .product-card { background: white; padding: 20px 16px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+        .product-card:hover { border-color: #2874f0; z-index: 2; box-shadow: 0 4px 20px rgba(40,116,240,0.12); }
+        .product-card:hover .p-img { transform: scale(1.05); }
+        .p-img-wrap { width: 100%; height: 160px; overflow: hidden; border-radius: 4px; background: #f1f3f6; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; }
+        .p-img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; }
+        .p-rating { background: #388e3c; color: white; font-size: 11px; padding: 2px 6px; border-radius: 3px; display: inline-block; margin-bottom: 6px; }
+        .p-name { font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #212121; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .p-price { font-size: 16px; font-weight: bold; }
+        .p-original { font-size: 12px; color: #878787; text-decoration: line-through; margin-left: 6px; }
+        .p-discount { font-size: 12px; color: #388e3c; font-weight: bold; }
+        .p-btns { display: flex; gap: 8px; margin-top: 12px; }
+        .p-view { flex: 1; background: white; border: 1.5px solid #2874f0; color: #2874f0; padding: 8px; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 12px; transition: all 0.2s; }
+        .p-view:hover { background: #2874f0; color: white; }
+        .p-add { flex: 1; background: #ff9f00; color: white; border: none; padding: 8px; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 12px; }
+        .p-add:hover { background: #f57c00; }
+
+        /* CART */
+        .cart-sidebar { position: fixed; right: -420px; top: 0; width: 400px; height: 100%; background: white; box-shadow: -4px 0 24px rgba(0,0,0,0.15); transition: right 0.3s; z-index: 200; display: flex; flex-direction: column; }
+        .cart-sidebar.open { right: 0; }
+        .cart-header { background: #2874f0; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .cart-header h3 { font-size: 18px; font-weight: bold; }
+        .close-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .cart-items { flex: 1; overflow-y: auto; padding: 16px; }
+        .cart-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f1f3f6; align-items: center; }
+        .cart-item-img { width: 60px; height: 60px; object-fit: contain; background: #f1f3f6; border-radius: 4px; flex-shrink: 0; }
+        .cart-footer { padding: 16px 20px; border-top: 2px solid #f1f3f6; background: #fafafa; }
+        .cart-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: bold; margin-bottom: 12px; }
+        .checkout-btn { width: 100%; background: #2874f0; color: white; border: none; padding: 14px; font-size: 15px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 199; display: none; }
+        .overlay.open { display: block; }
+
+        /* FOOTER */
+        .footer { background: #172337; color: white; padding: 32px 20px; margin-top: 32px; }
+        .footer-inner { max-width: 1280px; margin: 0 auto; }
+        .footer-cols { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .footer-col h4 { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-bottom: 12px; }
+        .footer-col a { display: block; color: rgba(255,255,255,0.75); font-size: 13px; margin-bottom: 8px; cursor: pointer; text-decoration: none; }
+        .footer-col a:hover { color: white; }
+        .footer-bottom { padding-top: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .footer-logo { font-size: 20px; font-weight: bold; color: white; }
+        .footer-logo span { color: #ffe082; }
+        .footer-copy { font-size: 12px; color: rgba(255,255,255,0.5); }
+
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #323232; color: white; padding: 12px 24px; border-radius: 4px; font-size: 14px; z-index: 300; transition: transform 0.3s; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .loading { text-align: center; padding: 40px; color: #878787; }
+
+        @media (max-width: 700px) {
+            .promo-grid { grid-template-columns: 1fr; }
+            .footer-cols { grid-template-columns: 1fr 1fr; }
+            .slide-emoji { display: none; }
+            .slide-title { font-size: 26px; }
+            .nav-actions { gap: 4px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+
+<!-- CART -->
+<div class="cart-sidebar" id="cart">
+    <div class="cart-header">
+        <h3>🛒 My Cart</h3>
+        <button class="close-btn" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+        <p style="text-align:center;color:#878787;padding:40px;">Cart is empty!</p>
+    </div>
+    <div class="cart-footer">
+        <div class="cart-total"><span>Total</span><span id="cartTotal">₹0</span></div>
+        <button class="checkout-btn" onclick="placeOrder()">🛒 Place Order</button>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="logo" onclick="window.location.href='/'">
+        Shop<span>Kart</span>
+        <small>India's Best Store</small>
+    </div>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search for products, brands and more...">
+        <button onclick="doSearch()">🔍</button>
+    </div>
+    <div class="nav-actions">
+        <button class="nav-btn" id="loginBtn" onclick="window.location.href='/login.html'">👤 Login</button>
+        <button class="nav-btn" id="userBtn" style="display:none;">
+            <span onclick="window.location.href='/profile.html'">👤 <span id="userName"></span></span>
+            &nbsp;|&nbsp;
+            <span onclick="logout()" style="color:#ff6161;cursor:pointer;">Logout</span>
+        </button>
+        <button class="nav-btn" onclick="window.location.href='/admin.html'">🛠️ Admin</button>
+        <button class="nav-btn cart-btn" onclick="openCart()">🛒 <span id="cartCount">0</span></button>
+    </div>
+</nav>
+
+<!-- MOBILE BOTTOM NAV -->
+<div style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e0e0e0;z-index:150;padding:8px 0;" id="mobileNav">
+    <div style="display:flex;justify-content:space-around;">
+        <div onclick="window.location.href='/'" style="display:flex;flex-direction:column;align-items:center;font-size:11px;color:#2874f0;cursor:pointer;">
+            <span style="font-size:22px;">🏠</span>Home
+        </div>
+        <div onclick="filterCat('electronics',document.querySelectorAll('.cat-item')[1])" style="display:flex;flex-direction:column;align-items:center;font-size:11px;cursor:pointer;color:#878787;">
+            <span style="font-size:22px;">📱</span>Electronics
+        </div>
+        <div onclick="openCart()" style="display:flex;flex-direction:column;align-items:center;font-size:11px;cursor:pointer;color:#878787;position:relative;">
+            <span style="font-size:22px;">🛒</span>Cart
+            <span style="position:absolute;top:-4px;right:0;background:#ff6161;color:white;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;" id="mobileCartCount">0</span>
+        </div>
+        <div onclick="window.location.href='/profile.html'" style="display:flex;flex-direction:column;align-items:center;font-size:11px;cursor:pointer;color:#878787;">
+            <span style="font-size:22px;">👤</span>Profile
+        </div>
+        <div onclick="window.location.href='/admin.html'" style="display:flex;flex-direction:column;align-items:center;font-size:11px;cursor:pointer;color:#878787;">
+            <span style="font-size:22px;">🛠️</span>Admin
+        </div>
+    </div>
+</div>
+
+<!-- CATEGORY BAR -->
+<div class="cat-bar">
+    <div class="cat-inner">
+        <div class="cat-item active" onclick="filterCat('all',this)"><span class="cat-icon">🏠</span>All</div>
+        <div class="cat-item" onclick="filterCat('electronics',this)"><span class="cat-icon">📱</span>Electronics</div>
+        <div class="cat-item" onclick="filterCat('fashion',this)"><span class="cat-icon">👗</span>Fashion</div>
+        <div class="cat-item" onclick="filterCat('home',this)"><span class="cat-icon">🏡</span>Home</div>
+        <div class="cat-item" onclick="filterCat('beauty',this)"><span class="cat-icon">💄</span>Beauty</div>
+        <div class="cat-item" onclick="filterCat('sports',this)"><span class="cat-icon">⚽</span>Sports</div>
+        <div class="cat-item" onclick="filterCat('books',this)"><span class="cat-icon">📚</span>Books</div>
+    </div>
+</div>
+
+<!-- HERO SLIDER -->
+<div class="hero-slider">
+    <div class="slide slide-1 active">
+        <div class="slide-content">
+            <div class="slide-tag">MEGA SALE</div>
+            <div class="slide-title">Up to 80% OFF<br>on Electronics</div>
+            <div class="slide-sub">Smartphones, Laptops, Earbuds & More!</div>
+            <button class="slide-btn" onclick="filterCat('electronics',document.querySelectorAll('.cat-item')[1])">Shop Now →</button>
+        </div>
+        <div class="slide-emoji">📱</div>
+    </div>
+    <div class="slide slide-2">
+        <div class="slide-content">
+            <div class="slide-tag">NEW ARRIVALS</div>
+            <div class="slide-title">Fashion Week<br>Sale is Live!</div>
+            <div class="slide-sub">Trendy styles starting from ₹299</div>
+            <button class="slide-btn" onclick="filterCat('fashion',document.querySelectorAll('.cat-item')[2])">Explore →</button>
+        </div>
+        <div class="slide-emoji">👗</div>
+    </div>
+    <div class="slide slide-3">
+        <div class="slide-content">
+            <div class="slide-tag">FRESH DEALS</div>
+            <div class="slide-title">Home Essentials<br>at Best Prices</div>
+            <div class="slide-sub">Kitchen, Furniture & More!</div>
+            <button class="slide-btn" onclick="filterCat('home',document.querySelectorAll('.cat-item')[3])">Shop Now →</button>
+        </div>
+        <div class="slide-emoji">🏡</div>
+    </div>
+    <div class="slide slide-4">
+        <div class="slide-content">
+            <div class="slide-tag">SPECIAL OFFER</div>
+            <div class="slide-title">Sports & Fitness<br>Super Sale!</div>
+            <div class="slide-sub">Get fit with best gear at lowest prices</div>
+            <button class="slide-btn" onclick="filterCat('sports',document.querySelectorAll('.cat-item')[5])">Explore →</button>
+        </div>
+        <div class="slide-emoji">⚽</div>
+    </div>
+    <button class="slider-arrow arrow-left" onclick="changeSlide(-1)">‹</button>
+    <button class="slider-arrow arrow-right" onclick="changeSlide(1)">›</button>
+    <div class="slider-dots" id="sliderDots"></div>
+</div>
+
+<!-- FLASH DEALS -->
+<div class="section">
+    <div class="section-card">
+        <div class="section-head">
+            <div class="section-head-left">
+                <div class="section-title">⚡ Flash Deals</div>
+                <div class="timer" id="timer">05:59:59</div>
+            </div>
+            <button class="view-all-btn" onclick="showToast('Loading all deals...')">View All</button>
+        </div>
+        <div class="h-products" id="flashDeals">
+            <div class="loading">Loading deals...</div>
+        </div>
+    </div>
+</div>
+
+<!-- PROMO BANNERS -->
+<div class="section">
+    <div class="promo-grid">
+        <div class="promo-card" style="background:linear-gradient(135deg,#ff6f00,#ffca28);" onclick="filterCat('electronics',document.querySelectorAll('.cat-item')[1])">
+            <h3>Electronics Sale</h3>
+            <p>Up to 70% off on top brands</p>
+            <button class="promo-btn" style="color:#ff6f00;">Shop Now →</button>
+            <div class="promo-emoji">📱</div>
+        </div>
+        <div class="promo-card" style="background:linear-gradient(135deg,#1b5e20,#43a047);" onclick="filterCat('fashion',document.querySelectorAll('.cat-item')[2])">
+            <h3>Fashion Week</h3>
+            <p>New arrivals every day</p>
+            <button class="promo-btn" style="color:#1b5e20;">Explore →</button>
+            <div class="promo-emoji">👗</div>
+        </div>
+    </div>
+</div>
+
+<!-- ALL PRODUCTS -->
+<div class="section" id="products">
+    <div class="section-card">
+        <div class="section-head">
+            <div class="section-head-left">
+                <div class="section-title">🌟 Top Picks For You</div>
+                <span id="productCount" style="font-size:13px;color:#878787;"></span>
+            </div>
+            <select id="sortSelect" onchange="sortProducts(this.value)" style="padding:8px 12px;border:1px solid #e0e0e0;border-radius:4px;font-size:13px;cursor:pointer;">
+                <option value="default">Sort: Relevance</option>
+                <option value="priceLow">Price: Low to High</option>
+                <option value="priceHigh">Price: High to Low</option>
+                <option value="rating">Top Rated</option>
+                <option value="discount">Best Discount</option>
+            </select>
+        </div>
+        <div class="products-grid" id="productsGrid">
+            <div class="loading" style="grid-column:1/-1;">Loading products...</div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-cols">
+            <div class="footer-col">
+                <h4>ABOUT</h4>
+                <a>Contact Us</a><a>About Us</a><a>Careers</a><a>Press</a>
+            </div>
+            <div class="footer-col">
+                <h4>HELP</h4>
+                <a>Payments</a><a>Shipping</a><a>Returns</a><a>FAQ</a>
+            </div>
+            <div class="footer-col">
+                <h4>POLICY</h4>
+                <a>Return Policy</a><a>Terms Of Use</a><a>Privacy</a><a>Security</a>
+            </div>
+            <div class="footer-col">
+                <h4>SOCIAL</h4>
+                <a>🐦 Twitter</a><a>📘 Facebook</a><a>📸 Instagram</a><a>▶️ YouTube</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-logo">Shop<span>Kart</span></div>
+            <div class="footer-copy">© 2026 ShopKart Pvt. Ltd. All Rights Reserved.</div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    let cart = JSON.parse(localStorage.getItem('shopkartCart') || '[]');
+    let allProducts = [];
+    let currentSlide = 0;
+    let slideTimer;
+
+    // Show mobile nav
+function checkMobile() {
+    const mobileNav = document.getElementById('mobileNav');
+    if (window.innerWidth <= 768) {
+        mobileNav.style.display = 'block';
+        document.body.style.paddingBottom = '60px';
+    } else {
+        mobileNav.style.display = 'none';
+        document.body.style.paddingBottom = '0';
+    }
+    // Sync mobile cart count
+    document.getElementById('mobileCartCount').textContent = cart.length;
+}
+window.addEventListener('resize', checkMobile);
+checkMobile();
+
+    const images = {
+        electronics: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400',
+        fashion: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400',
+        home: 'https://images.unsplash.com/photo-1585515320310-259814833e62?w=400',
+        beauty: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400',
+        sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400',
+        books: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400',
+        default: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400'
+    };
+
+    // SLIDER
+    function initSlider() {
+        const slides = document.querySelectorAll('.slide');
+        const dotsContainer = document.getElementById('sliderDots');
+        dotsContainer.innerHTML = Array.from(slides).map((_,i) =>
+            `<div class="dot ${i===0?'active':''}" onclick="goSlide(${i})"></div>`).join('');
+        startAutoSlide();
+    }
+
+    function goSlide(n) {
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        slides[currentSlide].classList.remove('active');
+        dots[currentSlide].classList.remove('active');
+        currentSlide = (n + slides.length) % slides.length;
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
+    }
+
+    function changeSlide(dir) {
+        clearInterval(slideTimer);
+        goSlide(currentSlide + dir);
+        startAutoSlide();
+    }
+
+    function startAutoSlide() {
+        slideTimer = setInterval(() => goSlide(currentSlide + 1), 4000);
+    }
+
+    // TIMER
+    function startTimer() {
+        let h=5, m=59, s=59;
+        setInterval(() => {
+            s--; if(s<0){s=59;m--;} if(m<0){m=59;h--;} if(h<0)h=0;
+            document.getElementById('timer').textContent =
+                `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }, 1000);
+    }
+
+    // LOGIN
+    function checkLogin() {
+        const user = JSON.parse(localStorage.getItem('shopkartUser') || 'null');
+        if (user) {
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('userBtn').style.display = 'block';
+            document.getElementById('userName').textContent = user.fullName.split(' ')[0];
+        }
+        document.getElementById('cartCount').textContent = cart.length;
+        renderCart();
+    }
+
+    function logout() {
+        localStorage.removeItem('shopkartUser');
+        window.location.reload();
+    }
+
+    // PRODUCTS
+    async function loadProducts() {
+        const res = await fetch('/api/products');
+        allProducts = await res.json();
+        if (allProducts.length === 0) {
+            await addSampleProducts();
+        } else {
+            renderFlashDeals();
+            renderGrid(allProducts);
+        }
+    }
+
+    async function addSampleProducts() {
+        const samples = [
+            { name:'Samsung Galaxy S24', description:'Latest flagship smartphone', price:79999, originalPrice:109999, discount:27, category:'electronics', imageUrl:'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400', stock:10, rating:4.7 },
+            { name:'Apple AirPods Pro', description:'Active noise cancellation', price:19999, originalPrice:26900, discount:25, category:'electronics', imageUrl:'https://images.unsplash.com/photo-1588423771073-b8903fead714?w=400', stock:15, rating:4.8 },
+            { name:'Nike Running Shoes', description:'Lightweight running shoes', price:6499, originalPrice:9995, discount:35, category:'fashion', imageUrl:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400', stock:20, rating:4.6 },
+            { name:'HP Laptop 15', description:'Core i7 16GB RAM laptop', price:52999, originalPrice:74999, discount:29, category:'electronics', imageUrl:'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400', stock:8, rating:4.5 },
+            { name:'boAt Headphones', description:'Wireless bluetooth headphones', price:1299, originalPrice:3990, discount:67, category:'electronics', imageUrl:'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400', stock:50, rating:4.3 },
+            { name:'Levis Jeans', description:'Slim fit comfortable jeans', price:2299, originalPrice:3999, discount:42, category:'fashion', imageUrl:'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400', stock:30, rating:4.4 },
+            { name:'Mixer Grinder', description:'750W powerful mixer grinder', price:1799, originalPrice:4500, discount:60, category:'home', imageUrl:'https://images.unsplash.com/photo-1585515320310-259814833e62?w=400', stock:25, rating:4.2 },
+            { name:'Atomic Habits', description:'Bestselling book by James Clear', price:349, originalPrice:799, discount:56, category:'books', imageUrl:'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400', stock:100, rating:4.9 },
+            { name:'Canon DSLR Camera', description:'24MP DSLR camera', price:26999, originalPrice:38000, discount:28, category:'electronics', imageUrl:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400', stock:12, rating:4.7 },
+            { name:'Yoga Mat Premium', description:'Anti-slip premium yoga mat', price:899, originalPrice:1999, discount:55, category:'sports', imageUrl:'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400', stock:40, rating:4.5 },
+            { name:'Face Moisturizer', description:'Daily hydrating face cream', price:499, originalPrice:999, discount:50, category:'beauty', imageUrl:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400', stock:60, rating:4.3 },
+            { name:'Wireless Keyboard', description:'Bluetooth wireless keyboard', price:1499, originalPrice:2999, discount:50, category:'electronics', imageUrl:'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400', stock:35, rating:4.4 }
+        ];
+        for (let p of samples) {
+            await fetch('/api/products', {
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify(p)
+            });
+        }
+        const res = await fetch('/api/products');
+        allProducts = await res.json();
+        renderFlashDeals();
+        renderGrid(allProducts);
+    }
+
+    function getImg(p) {
+        if (p.imageUrl && p.imageUrl.length > 5) return p.imageUrl;
+        return images[p.category] || images.default;
+    }
+
+    function renderFlashDeals() {
+        const deals = [...allProducts].sort((a,b) => b.discount - a.discount).slice(0,10);
+        document.getElementById('flashDeals').innerHTML = deals.map(p => `
+            <div class="h-product-card" onclick="window.location.href='/product.html?id=${p.id}'">
+                <div class="h-img-wrap">
+                    <img class="h-img" src="${getImg(p)}" onerror="this.src='${images.default}'">
+                </div>
+                <div class="h-rating">${p.rating}★</div>
+                <div class="h-name">${p.name}</div>
+                <div class="h-price">₹${p.price.toLocaleString('en-IN')}</div>
+                <div style="display:flex;gap:6px;">
+                    <div class="h-original">₹${p.originalPrice.toLocaleString('en-IN')}</div>
+                    <div class="h-discount">${p.discount}% off</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderGrid(products) {
+        document.getElementById('productCount').textContent = products.length + ' products';
+        if (products.length === 0) {
+            document.getElementById('productsGrid').innerHTML = '<div class="loading" style="grid-column:1/-1;">No products found!</div>';
+            return;
+        }
+        document.getElementById('productsGrid').innerHTML = products.map(p => `
+            <div class="product-card">
+                <div class="p-img-wrap">
+                    <img class="p-img" src="${getImg(p)}" onerror="this.src='${images.default}'">
+                </div>
+                <div class="p-rating">${p.rating}★</div>
+                <div class="p-name">${p.name}</div>
+                <div>
+                    <span class="p-price">₹${p.price.toLocaleString('en-IN')}</span>
+                    <span class="p-original">₹${p.originalPrice.toLocaleString('en-IN')}</span>
+                </div>
+                <div class="p-discount">${p.discount}% off</div>
+                <div class="p-btns">
+                    <button class="p-view" onclick="window.location.href='/product.html?id=${p.id}'">VIEW</button>
+                    <button class="p-add" onclick="addToCart(${p.id},'${p.name.replace(/'/g,"\\'")}',${p.price},'${p.category}','${getImg(p)}')">🛒 ADD</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function filterCat(cat, el) {
+        document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('products').scrollIntoView({ behavior:'smooth' });
+        renderGrid(cat === 'all' ? allProducts : allProducts.filter(p => p.category === cat));
+    }
+
+    function sortProducts(val) {
+        let sorted = [...allProducts];
+        if (val === 'priceLow') sorted.sort((a,b) => a.price - b.price);
+        if (val === 'priceHigh') sorted.sort((a,b) => b.price - a.price);
+        if (val === 'rating') sorted.sort((a,b) => b.rating - a.rating);
+        if (val === 'discount') sorted.sort((a,b) => b.discount - a.discount);
+        renderGrid(sorted);
+    }
+
+   function doSearch() {
+    const q = document.getElementById('searchInput').value.trim();
+    if (!q) { renderGrid(allProducts); return; }
+    window.location.href = '/search.html?q=' + encodeURIComponent(q);
+}
+
+    document.getElementById('searchInput').addEventListener('keyup', e => {
+        if (e.key === 'Enter') doSearch();
+    });
+
+    // CART
+   function addToCart(id, name, price, category, imageUrl) {
+    cart.push({ id, name, price, category, imageUrl });
+    document.getElementById('cartCount').textContent = cart.length;
+    document.getElementById('mobileCartCount').textContent = cart.length;
+    localStorage.setItem('shopkartCart', JSON.stringify(cart));
+    showToast('🛒 ' + name.substring(0,30) + '... added!');
+    renderCart();
+}
+
+    function renderCart() {
+        const items = document.getElementById('cartItems');
+        if (cart.length === 0) {
+            items.innerHTML = '<p style="text-align:center;color:#878787;padding:40px;">🛒 Cart is empty!</p>';
+            document.getElementById('cartTotal').textContent = '₹0';
+            return;
+        }
+        items.innerHTML = cart.map((item,i) => `
+            <div class="cart-item">
+                <img class="cart-item-img" src="${item.imageUrl || images[item.category] || images.default}"
+                    onerror="this.src='${images.default}'">
+                <div style="flex:1">
+                    <div style="font-size:13px;font-weight:500;margin-bottom:4px;">${item.name.substring(0,35)}...</div>
+                    <div style="font-size:15px;font-weight:bold;color:#2874f0;">₹${item.price.toLocaleString('en-IN')}</div>
+                </div>
+                <button onclick="removeFromCart(${i})" style="background:none;border:none;cursor:pointer;font-size:20px;">🗑️</button>
+            </div>
+        `).join('');
+        document.getElementById('cartTotal').textContent = '₹' + cart.reduce((s,i) => s+i.price, 0).toLocaleString('en-IN');
+    }
+
+    function removeFromCart(i) {
+        cart.splice(i, 1);
+        document.getElementById('cartCount').textContent = cart.length;
+        localStorage.setItem('shopkartCart', JSON.stringify(cart));
+        renderCart();
+    }
+
+    function openCart() {
+        document.getElementById('cart').classList.add('open');
+        document.getElementById('overlay').classList.add('open');
+    }
+
+    function closeCart() {
+        document.getElementById('cart').classList.remove('open');
+        document.getElementById('overlay').classList.remove('open');
+    }
+
+    function placeOrder() {
+        if (cart.length === 0) { showToast('Cart is empty!'); return; }
+        localStorage.setItem('shopkartCart', JSON.stringify(cart));
+        window.location.href = '/checkout.html';
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    initSlider();
+    startTimer();
+    checkLogin();
+    loadProducts();
+</script>
+</body>
+</html>

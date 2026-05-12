@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/mobile.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - ShopKart</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f1f3f6; }
+        .navbar { background: #2874f0; padding: 12px 20px; display: flex; align-items: center; gap: 16px; }
+        .logo { color: white; font-size: 24px; font-weight: bold; cursor: pointer; }
+        .logo span { color: #ffe082; }
+        .back-btn { background: white; color: #2874f0; border: none; padding: 8px 16px; cursor: pointer; font-weight: bold; border-radius: 4px; }
+        .container { max-width: 900px; margin: 24px auto; padding: 0 16px; display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+        .form-section { background: white; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .form-section h2 { font-size: 20px; font-weight: bold; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f1f3f6; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #212121; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0;
+            border-radius: 4px; font-size: 14px; outline: none; font-family: Arial;
+        }
+        .form-group input:focus, .form-group textarea:focus { border-color: #2874f0; }
+        .form-group textarea { height: 80px; resize: none; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        /* ORDER SUMMARY */
+        .summary-section { display: flex; flex-direction: column; gap: 16px; }
+        .summary-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .summary-card h3 { font-size: 16px; font-weight: bold; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #f1f3f6; }
+        .order-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f1f3f6; align-items: center; }
+        .order-item:last-child { border-bottom: none; }
+        .item-img { width: 50px; height: 50px; object-fit: contain; background: #f1f3f6; border-radius: 4px; }
+        .item-name { font-size: 13px; font-weight: 500; flex: 1; }
+        .item-price { font-size: 14px; font-weight: bold; color: #2874f0; }
+        .price-row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; }
+        .price-row.total { font-size: 16px; font-weight: bold; border-top: 1px solid #f1f3f6; padding-top: 12px; margin-top: 6px; }
+        .discount-text { color: #388e3c; }
+
+        /* PAYMENT */
+        .payment-section { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .payment-section h3 { font-size: 16px; font-weight: bold; margin-bottom: 16px; }
+        .payment-option { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+        .payment-option:hover, .payment-option.selected { border-color: #2874f0; background: #e3f2fd; }
+        .payment-icon { font-size: 24px; }
+        .payment-label { font-size: 14px; font-weight: 500; }
+
+        .place-order-btn { width: 100%; background: #fb641b; color: white; border: none; padding: 16px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 16px; transition: background 0.2s; }
+        .place-order-btn:hover { background: #e64a19; }
+
+        /* SUCCESS */
+        .success-page { display: none; text-align: center; padding: 60px 20px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .success-icon { font-size: 80px; margin-bottom: 20px; }
+        .success-page h2 { font-size: 28px; font-weight: bold; color: #388e3c; margin-bottom: 12px; }
+        .success-page p { font-size: 15px; color: #878787; margin-bottom: 8px; }
+        .order-id { font-size: 18px; font-weight: bold; color: #2874f0; margin: 16px 0; }
+        .continue-btn { background: #2874f0; color: white; border: none; padding: 12px 32px; font-size: 15px; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 16px; }
+
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #323232; color: white; padding: 12px 24px; border-radius: 4px; font-size: 14px; z-index: 200; transition: transform 0.3s; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 700px) { .container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<nav class="navbar">
+    <div class="logo" onclick="window.location.href='/'">Shop<span>Kart</span></div>
+    <button class="back-btn" onclick="window.location.href='/'">← Back</button>
+</nav>
+
+<div class="container" id="checkoutContainer">
+    <!-- DELIVERY FORM -->
+    <div class="form-section">
+        <h2>📦 Delivery Details</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Full Name *</label>
+                <input type="text" id="customerName" placeholder="Your full name">
+            </div>
+            <div class="form-group">
+                <label>Phone Number *</label>
+                <input type="tel" id="customerPhone" placeholder="10-digit mobile number">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" id="customerEmail" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+            <label>Delivery Address *</label>
+            <textarea id="address" placeholder="House no, Street, Area, City, State, PIN code"></textarea>
+        </div>
+
+        <h2 style="margin-top:24px;">💳 Payment Method</h2>
+        <div style="margin-top:16px;">
+            <div class="payment-option selected" onclick="selectPayment(this)">
+                <span class="payment-icon">💳</span>
+                <span class="payment-label">Credit / Debit Card</span>
+            </div>
+            <div class="payment-option" onclick="selectPayment(this)">
+                <span class="payment-icon">📱</span>
+                <span class="payment-label">UPI Payment</span>
+            </div>
+            <div class="payment-option" onclick="selectPayment(this)">
+                <span class="payment-icon">🏦</span>
+                <span class="payment-label">Net Banking</span>
+            </div>
+            <div class="payment-option" onclick="selectPayment(this)">
+                <span class="payment-icon">💵</span>
+                <span class="payment-label">Cash on Delivery</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORDER SUMMARY -->
+    <div class="summary-section">
+        <div class="summary-card">
+            <h3>🛒 Order Summary</h3>
+            <div id="orderItems"></div>
+            <div style="margin-top:12px;">
+                <div class="price-row"><span>Subtotal</span><span id="subtotal">₹0</span></div>
+                <div class="price-row discount-text"><span>Discount</span><span id="discount">-₹0</span></div>
+                <div class="price-row"><span>Delivery</span><span style="color:#388e3c;">FREE</span></div>
+                <div class="price-row total"><span>Total</span><span id="total">₹0</span></div>
+            </div>
+            <button class="place-order-btn" onclick="placeOrder()">🛒 Place Order</button>
+        </div>
+    </div>
+</div>
+
+<!-- SUCCESS PAGE -->
+<div style="max-width:600px;margin:40px auto;padding:0 16px;display:none;" id="successContainer">
+    <div class="success-page" id="successPage">
+        <div class="success-icon">🎉</div>
+        <h2>Order Placed Successfully!</h2>
+        <p>Thank you for shopping with ShopKart!</p>
+        <p>Your order has been confirmed and will be delivered soon.</p>
+        <div class="order-id" id="orderId"></div>
+        <p style="color:#212121;">Estimated Delivery: <b>2-3 Business Days</b></p>
+        <button class="continue-btn" onclick="window.location.href='/'">Continue Shopping</button>
+    </div>
+</div>
+
+<script>
+    let cartItems = [];
+
+    const images = {
+        electronics: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=100',
+        fashion: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100',
+        home: 'https://images.unsplash.com/photo-1585515320310-259814833e62?w=100',
+        beauty: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=100',
+        sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=100',
+        books: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=100',
+        default: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=100'
+    };
+
+    function loadCart() {
+        const saved = localStorage.getItem('shopkartCart');
+        if (saved) cartItems = JSON.parse(saved);
+        if (cartItems.length === 0) {
+            showToast('Cart is empty! Redirecting...');
+            setTimeout(() => window.location.href = '/', 2000);
+            return;
+        }
+        renderOrderSummary();
+    }
+
+    function renderOrderSummary() {
+        const container = document.getElementById('orderItems');
+        container.innerHTML = cartItems.map(item => `
+            <div class="order-item">
+                <img class="item-img" src="${images[item.category] || images.default}"
+                    onerror="this.src='${images.default}'">
+                <span class="item-name">${item.name}</span>
+                <span class="item-price">₹${item.price.toLocaleString('en-IN')}</span>
+            </div>
+        `).join('');
+
+        const subtotal = cartItems.reduce((s, i) => s + i.price, 0);
+        document.getElementById('subtotal').textContent = '₹' + subtotal.toLocaleString('en-IN');
+        document.getElementById('discount').textContent = '-₹0';
+        document.getElementById('total').textContent = '₹' + subtotal.toLocaleString('en-IN');
+    }
+
+    function selectPayment(el) {
+        document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    async function placeOrder() {
+        const name = document.getElementById('customerName').value.trim();
+        const email = document.getElementById('customerEmail').value.trim();
+        const phone = document.getElementById('customerPhone').value.trim();
+        const address = document.getElementById('address').value.trim();
+
+        if (!name || !email || !phone || !address) {
+            showToast('❌ Please fill all delivery details!');
+            return;
+        }
+
+        const total = cartItems.reduce((s, i) => s + i.price, 0);
+        const productNames = cartItems.map(i => i.name).join(', ');
+
+        const order = {
+            customerName: name,
+            customerEmail: email,
+            customerPhone: phone,
+            address: address,
+            productNames: productNames,
+            totalAmount: total,
+            status: 'PENDING'
+        };
+
+        const res = await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(order)
+        });
+
+        if (res.ok) {
+            const placed = await res.json();
+            localStorage.removeItem('shopkartCart');
+            document.getElementById('checkoutContainer').style.display = 'none';
+            document.getElementById('successContainer').style.display = 'block';
+            document.getElementById('successPage').style.display = 'block';
+            document.getElementById('orderId').textContent = 'Order ID: #SK' + String(placed.id).padStart(5, '0');
+        } else {
+            showToast('❌ Order failed! Try again.');
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    loadCart();
+</script>
+</body>
+</html>

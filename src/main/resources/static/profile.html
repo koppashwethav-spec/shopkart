@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/mobile.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - ShopKart</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f1f3f6; }
+        .navbar { background: #2874f0; padding: 12px 20px; display: flex; align-items: center; gap: 16px; }
+        .logo { color: white; font-size: 24px; font-weight: bold; cursor: pointer; }
+        .logo span { color: #ffe082; }
+        .back-btn { background: white; color: #2874f0; border: none; padding: 8px 16px; cursor: pointer; font-weight: bold; border-radius: 4px; }
+
+        .container { max-width: 1000px; margin: 24px auto; padding: 0 16px; display: grid; grid-template-columns: 280px 1fr; gap: 20px; }
+
+        /* SIDEBAR */
+        .sidebar { display: flex; flex-direction: column; gap: 16px; }
+        .profile-card { background: white; border-radius: 8px; padding: 24px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .avatar { width: 80px; height: 80px; background: #2874f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; font-weight: bold; margin: 0 auto 12px; }
+        .user-name { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
+        .user-email { font-size: 13px; color: #878787; margin-bottom: 16px; }
+        .edit-profile-btn { width: 100%; background: #2874f0; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; }
+
+        .menu-card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; cursor: pointer; border-bottom: 1px solid #f1f3f6; transition: all 0.2s; font-size: 14px; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item:hover, .menu-item.active { background: #e3f2fd; color: #2874f0; }
+        .menu-icon { font-size: 20px; }
+
+        /* MAIN CONTENT */
+        .main-content { display: flex; flex-direction: column; gap: 16px; }
+        .content-card { background: white; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: none; }
+        .content-card.active { display: block; }
+        .content-card h2 { font-size: 20px; font-weight: bold; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f1f3f6; }
+
+        /* ORDERS */
+        .order-card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 16px; transition: box-shadow 0.2s; }
+        .order-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .order-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .order-id { font-size: 15px; font-weight: bold; color: #2874f0; }
+        .order-date { font-size: 13px; color: #878787; }
+        .order-status { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .status-PENDING { background: #fff3e0; color: #e65100; }
+        .status-CONFIRMED { background: #e3f2fd; color: #1565c0; }
+        .status-SHIPPED { background: #f3e5f5; color: #6a1b9a; }
+        .status-DELIVERED { background: #e8f5e9; color: #2e7d32; }
+        .status-CANCELLED { background: #ffebee; color: #c62828; }
+        .order-products { font-size: 13px; color: #212121; margin-bottom: 8px; }
+        .order-total { font-size: 15px; font-weight: bold; }
+        .order-address { font-size: 12px; color: #878787; margin-top: 6px; }
+
+        /* PROFILE FORM */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #212121; }
+        .form-group input { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 14px; outline: none; }
+        .form-group input:focus { border-color: #2874f0; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .save-btn { background: #2874f0; color: white; border: none; padding: 12px 32px; border-radius: 4px; font-size: 15px; font-weight: bold; cursor: pointer; }
+
+        /* WISHLIST */
+        .wishlist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 12px; }
+        .wishlist-card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; transition: box-shadow 0.2s; }
+        .wishlist-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .wishlist-img { width: 100%; height: 100px; object-fit: contain; border-radius: 4px; background: #f1f3f6; margin-bottom: 8px; }
+        .wishlist-name { font-size: 12px; margin-bottom: 4px; }
+        .wishlist-price { font-size: 14px; font-weight: bold; color: #2874f0; }
+
+        /* ADDRESSES */
+        .address-card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .address-type { font-size: 12px; font-weight: bold; background: #e3f2fd; color: #1565c0; padding: 2px 10px; border-radius: 12px; display: inline-block; margin-bottom: 8px; }
+        .address-text { font-size: 14px; color: #212121; line-height: 1.6; }
+
+        /* EMPTY STATE */
+        .empty-state { text-align: center; padding: 40px; color: #878787; }
+        .empty-icon { font-size: 60px; margin-bottom: 12px; }
+        .empty-text { font-size: 15px; }
+
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #323232; color: white; padding: 12px 24px; border-radius: 4px; font-size: 14px; z-index: 200; transition: transform 0.3s; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 700px) { .container { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<nav class="navbar">
+    <div class="logo" onclick="window.location.href='/'">Shop<span>Kart</span></div>
+    <button class="back-btn" onclick="window.location.href='/'">← Back to Store</button>
+</nav>
+
+<div class="container">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="profile-card">
+            <div class="avatar" id="avatar">👤</div>
+            <div class="user-name" id="profileName">Guest User</div>
+            <div class="user-email" id="profileEmail">Please login</div>
+            <button class="edit-profile-btn" onclick="showSection('editProfile')">✏️ Edit Profile</button>
+        </div>
+        <div class="menu-card">
+            <div class="menu-item active" onclick="showSection('orders')">
+                <span class="menu-icon">📦</span> My Orders
+            </div>
+            <div class="menu-item" onclick="showSection('editProfile')">
+                <span class="menu-icon">👤</span> Edit Profile
+            </div>
+            <div class="menu-item" onclick="showSection('addresses')">
+                <span class="menu-icon">📍</span> My Addresses
+            </div>
+            <div class="menu-item" onclick="showSection('wishlist')">
+                <span class="menu-icon">❤️</span> Wishlist
+            </div>
+            <div class="menu-item" onclick="showSection('settings')">
+                <span class="menu-icon">⚙️</span> Settings
+            </div>
+            <div class="menu-item" onclick="logout()" style="color:#ff6161;">
+                <span class="menu-icon">🚪</span> Logout
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <!-- ORDERS -->
+        <div class="content-card active" id="section-orders">
+            <h2>📦 My Orders</h2>
+            <div id="ordersList">
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <div class="empty-text">Loading orders...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT PROFILE -->
+        <div class="content-card" id="section-editProfile">
+            <h2>👤 Edit Profile</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="editName" placeholder="Your full name">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="editEmail" placeholder="Email" disabled style="background:#f5f5f5;">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="editPhone" placeholder="Phone number">
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="editDob">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <input type="text" id="editAddress" placeholder="Your address">
+            </div>
+            <button class="save-btn" onclick="saveProfile()">💾 Save Changes</button>
+        </div>
+
+        <!-- ADDRESSES -->
+        <div class="content-card" id="section-addresses">
+            <h2>📍 My Addresses</h2>
+            <div class="address-card">
+                <div class="address-type">🏠 Home</div>
+                <div class="address-text" id="homeAddress">No address saved yet.</div>
+            </div>
+            <div class="address-card">
+                <div class="address-type">🏢 Work</div>
+                <div class="address-text">Add your work address</div>
+            </div>
+        </div>
+
+        <!-- WISHLIST -->
+        <div class="content-card" id="section-wishlist">
+            <h2>❤️ My Wishlist</h2>
+            <div id="wishlistContent">
+                <div class="empty-state">
+                    <div class="empty-icon">❤️</div>
+                    <div class="empty-text">Your wishlist is empty!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="content-card" id="section-settings">
+            <h2>⚙️ Settings</h2>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid #e0e0e0;border-radius:8px;">
+                    <div>
+                        <div style="font-weight:bold;margin-bottom:4px;">📧 Email Notifications</div>
+                        <div style="font-size:13px;color:#878787;">Receive order updates via email</div>
+                    </div>
+                    <label style="position:relative;display:inline-block;width:48px;height:24px;">
+                        <input type="checkbox" checked style="opacity:0;width:0;height:0;">
+                        <span style="position:absolute;cursor:pointer;inset:0;background:#2874f0;border-radius:24px;"></span>
+                    </label>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid #e0e0e0;border-radius:8px;">
+                    <div>
+                        <div style="font-weight:bold;margin-bottom:4px;">📱 SMS Alerts</div>
+                        <div style="font-size:13px;color:#878787;">Get SMS for order delivery updates</div>
+                    </div>
+                    <label style="position:relative;display:inline-block;width:48px;height:24px;">
+                        <input type="checkbox" style="opacity:0;width:0;height:0;">
+                        <span style="position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:24px;"></span>
+                    </label>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid #e0e0e0;border-radius:8px;">
+                    <div>
+                        <div style="font-weight:bold;margin-bottom:4px;">🔒 Change Password</div>
+                        <div style="font-size:13px;color:#878787;">Update your account password</div>
+                    </div>
+                    <button onclick="showToast('Password change coming soon!')" style="background:#2874f0;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:13px;">Change</button>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid #ffebee;border-radius:8px;background:#ffebee;">
+                    <div>
+                        <div style="font-weight:bold;color:#c62828;margin-bottom:4px;">🗑️ Delete Account</div>
+                        <div style="font-size:13px;color:#878787;">Permanently delete your account</div>
+                    </div>
+                    <button onclick="showToast('Please contact support to delete account')" style="background:#c62828;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:13px;">Delete</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let currentUser = null;
+
+    function init() {
+        currentUser = JSON.parse(localStorage.getItem('shopkartUser') || 'null');
+        if (!currentUser) {
+            showToast('Please login first!');
+            setTimeout(() => window.location.href = '/login.html', 1500);
+            return;
+        }
+        // Set profile info
+        document.getElementById('profileName').textContent = currentUser.fullName;
+        document.getElementById('profileEmail').textContent = currentUser.email;
+        document.getElementById('avatar').textContent = currentUser.fullName.charAt(0).toUpperCase();
+        document.getElementById('editName').value = currentUser.fullName;
+        document.getElementById('editEmail').value = currentUser.email;
+        document.getElementById('editPhone').value = currentUser.phone || '';
+        document.getElementById('editAddress').value = currentUser.address || '';
+        document.getElementById('homeAddress').textContent = currentUser.address || 'No address saved yet.';
+        loadOrders();
+    }
+
+    function showSection(section) {
+        document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        document.getElementById('section-' + section).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    async function loadOrders() {
+        if (!currentUser) return;
+        try {
+            const res = await fetch('/api/orders/customer/' + currentUser.email);
+            const orders = await res.json();
+            renderOrders(orders);
+        } catch(e) {
+            document.getElementById('ordersList').innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-text">No orders yet!</div></div>';
+        }
+    }
+
+    function renderOrders(orders) {
+        if (orders.length === 0) {
+            document.getElementById('ordersList').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <div class="empty-text">No orders yet! Start shopping 🛍️</div>
+                    <button onclick="window.location.href='/'" style="margin-top:16px;background:#2874f0;color:white;border:none;padding:10px 24px;border-radius:4px;cursor:pointer;font-weight:bold;">Shop Now</button>
+                </div>`;
+            return;
+        }
+        document.getElementById('ordersList').innerHTML = orders.map(o => `
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-id">#SK${String(o.id).padStart(5,'0')}</div>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div class="order-date">${new Date(o.orderDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div>
+                        <div class="order-status status-${o.status}">${o.status}</div>
+                    </div>
+                </div>
+                <div class="order-products">📦 ${o.productNames}</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div class="order-total">Total: ₹${o.totalAmount.toLocaleString('en-IN')}</div>
+                    ${o.status === 'DELIVERED' ? '<button onclick="showToast(\'Order delivered! Rate your products\')" style="background:#388e3c;color:white;border:none;padding:6px 16px;border-radius:4px;cursor:pointer;font-size:12px;">⭐ Rate</button>' : ''}
+                    ${o.status === 'PENDING' ? '<button onclick="showToast(\'Order cancellation requested!\')" style="background:#ffebee;color:#c62828;border:1px solid #c62828;padding:6px 16px;border-radius:4px;cursor:pointer;font-size:12px;">Cancel</button>' : ''}
+                </div>
+                <div class="order-address">📍 ${o.address}</div>
+            </div>
+        `).join('');
+    }
+
+    async function saveProfile() {
+        if (!currentUser) return;
+        const updated = {
+            ...currentUser,
+            fullName: document.getElementById('editName').value,
+            phone: document.getElementById('editPhone').value,
+            address: document.getElementById('editAddress').value
+        };
+        try {
+            const res = await fetch('/api/users/' + currentUser.id, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updated)
+            });
+            if (res.ok) {
+                const saved = await res.json();
+                localStorage.setItem('shopkartUser', JSON.stringify(saved));
+                currentUser = saved;
+                document.getElementById('profileName').textContent = saved.fullName;
+                document.getElementById('homeAddress').textContent = saved.address || 'No address saved.';
+                showToast('✅ Profile updated successfully!');
+            }
+        } catch(e) {
+            showToast('❌ Update failed!');
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('shopkartUser');
+        window.location.href = '/';
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    init();
+</script>
+</body>
+</html>

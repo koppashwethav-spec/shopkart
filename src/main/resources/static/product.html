@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/mobile.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - ShopKart</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f1f3f6; }
+        .navbar { background: #2874f0; padding: 12px 20px; display: flex; align-items: center; gap: 16px; }
+        .logo { color: white; font-size: 24px; font-weight: bold; cursor: pointer; }
+        .logo span { color: #ffe082; }
+        .back-btn { background: white; color: #2874f0; border: none; padding: 8px 16px; cursor: pointer; font-weight: bold; border-radius: 4px; }
+        .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+        .product-detail { background: white; border-radius: 8px; padding: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .product-image-section { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+        .main-image { width: 100%; height: 380px; background: #f1f3f6; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; }
+        .main-image img { width: 100%; height: 100%; object-fit: contain; }
+        .thumbnail-row { display: flex; gap: 8px; }
+        .thumbnail { width: 70px; height: 70px; border-radius: 4px; border: 2px solid #e0e0e0; cursor: pointer; overflow: hidden; transition: border-color 0.2s; }
+        .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+        .thumbnail:hover, .thumbnail.active { border-color: #2874f0; }
+        .product-info { display: flex; flex-direction: column; gap: 16px; }
+        .product-brand { font-size: 13px; color: #878787; text-transform: uppercase; }
+        .product-title { font-size: 24px; font-weight: bold; color: #212121; }
+        .rating-row { display: flex; align-items: center; gap: 12px; }
+        .rating-badge { background: #388e3c; color: white; padding: 4px 10px; border-radius: 4px; font-size: 14px; font-weight: bold; }
+        .rating-count { font-size: 13px; color: #878787; }
+        .price-section { border-top: 1px solid #f1f3f6; border-bottom: 1px solid #f1f3f6; padding: 16px 0; }
+        .current-price { font-size: 32px; font-weight: bold; }
+        .original-price { font-size: 16px; color: #878787; text-decoration: line-through; margin-left: 12px; }
+        .discount-badge { font-size: 16px; color: #388e3c; font-weight: bold; margin-left: 12px; }
+        .savings { font-size: 13px; color: #388e3c; margin-top: 6px; }
+        .offer-item { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+        .qty-ctrl { display: flex; align-items: center; gap: 8px; }
+        .qty-btn { width: 32px; height: 32px; border: 1px solid #e0e0e0; background: white; cursor: pointer; border-radius: 4px; font-size: 18px; }
+        .qty-btn:hover { border-color: #2874f0; color: #2874f0; }
+        .qty-val { font-size: 16px; font-weight: bold; min-width: 30px; text-align: center; }
+        .action-btns { display: flex; gap: 12px; }
+        .cart-btn { flex: 1; background: #ff9f00; color: white; border: none; padding: 14px; font-size: 15px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .buy-btn { flex: 1; background: #fb641b; color: white; border: none; padding: 14px; font-size: 15px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .delivery-section { background: #f1f3f6; padding: 16px; border-radius: 4px; }
+        .delivery-section h4 { font-size: 14px; font-weight: bold; margin-bottom: 8px; }
+        .delivery-item { font-size: 13px; margin-bottom: 6px; }
+
+        /* REVIEWS */
+        .reviews-section { background: white; border-radius: 8px; padding: 24px 32px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .reviews-section h3 { font-size: 20px; font-weight: bold; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f1f3f6; }
+        .reviews-grid { display: grid; grid-template-columns: 300px 1fr; gap: 32px; margin-bottom: 32px; }
+        .rating-summary { text-align: center; }
+        .big-rating { font-size: 64px; font-weight: bold; color: #212121; line-height: 1; }
+        .big-stars { font-size: 24px; color: #ff9f00; margin: 8px 0; }
+        .total-reviews { font-size: 13px; color: #878787; }
+        .rating-bars { display: flex; flex-direction: column; gap: 8px; }
+        .rating-bar-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .bar-track { flex: 1; height: 8px; background: #f1f3f6; border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; background: #388e3c; border-radius: 4px; transition: width 0.5s; }
+        .bar-count { color: #878787; min-width: 30px; }
+
+        /* ADD REVIEW */
+        .add-review { background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+        .add-review h4 { font-size: 16px; font-weight: bold; margin-bottom: 16px; }
+        .star-select { display: flex; gap: 8px; margin-bottom: 16px; }
+        .star-btn { font-size: 28px; cursor: pointer; color: #e0e0e0; transition: color 0.2s; }
+        .star-btn.active { color: #ff9f00; }
+        .review-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .review-inputs input { padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 14px; outline: none; }
+        .review-inputs input:focus { border-color: #2874f0; }
+        .review-textarea { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 14px; outline: none; height: 80px; resize: none; font-family: Arial; margin-bottom: 12px; }
+        .review-textarea:focus { border-color: #2874f0; }
+        .submit-review-btn { background: #2874f0; color: white; border: none; padding: 10px 24px; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; }
+
+        /* REVIEW CARDS */
+        .review-card { padding: 16px 0; border-bottom: 1px solid #f1f3f6; }
+        .review-card:last-child { border-bottom: none; }
+        .review-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .reviewer-avatar { width: 40px; height: 40px; background: #2874f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; }
+        .reviewer-name { font-weight: bold; font-size: 14px; }
+        .review-stars { color: #ff9f00; font-size: 14px; }
+        .review-date { font-size: 12px; color: #878787; margin-left: auto; }
+        .review-comment { font-size: 14px; color: #212121; line-height: 1.6; }
+        .verified { font-size: 11px; color: #388e3c; font-weight: 600; }
+
+        /* SIMILAR */
+        .similar-section { background: white; border-radius: 8px; padding: 24px 32px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .similar-section h3 { font-size: 18px; font-weight: bold; margin-bottom: 16px; }
+        .similar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+        .similar-card { border: 1px solid #e0e0e0; border-radius: 4px; padding: 12px; cursor: pointer; transition: box-shadow 0.2s; text-align: center; }
+        .similar-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .similar-card img { width: 100%; height: 120px; object-fit: contain; border-radius: 4px; margin-bottom: 8px; background: #f1f3f6; }
+        .similar-name { font-size: 12px; margin-bottom: 4px; }
+        .similar-price { font-size: 14px; font-weight: bold; }
+
+        .description-section { background: white; border-radius: 8px; padding: 24px 32px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .description-section h3 { font-size: 18px; font-weight: bold; margin-bottom: 16px; }
+
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #323232; color: white; padding: 12px 24px; border-radius: 4px; font-size: 14px; z-index: 200; transition: transform 0.3s; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        @media (max-width: 700px) { .product-detail { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<nav class="navbar">
+    <div class="logo" onclick="window.location.href='/'">Shop<span>Kart</span></div>
+    <button class="back-btn" onclick="window.location.href='/'">← Back</button>
+</nav>
+
+<div class="container">
+    <div class="product-detail" id="productDetail">
+        <div style="text-align:center;padding:40px;color:#878787;">Loading...</div>
+    </div>
+
+    <div class="description-section">
+        <h3>📋 Product Description</h3>
+        <div id="descriptionText"></div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="reviews-section">
+        <h3>⭐ Ratings & Reviews</h3>
+        <div class="reviews-grid">
+            <div class="rating-summary">
+                <div class="big-rating" id="avgRating">0</div>
+                <div class="big-stars" id="avgStars">☆☆☆☆☆</div>
+                <div class="total-reviews" id="totalReviews">0 reviews</div>
+            </div>
+            <div class="rating-bars" id="ratingBars"></div>
+        </div>
+
+        <!-- ADD REVIEW -->
+        <div class="add-review">
+            <h4>✍️ Write a Review</h4>
+            <div class="star-select" id="starSelect">
+                <span class="star-btn" onclick="selectStar(1)">★</span>
+                <span class="star-btn" onclick="selectStar(2)">★</span>
+                <span class="star-btn" onclick="selectStar(3)">★</span>
+                <span class="star-btn" onclick="selectStar(4)">★</span>
+                <span class="star-btn" onclick="selectStar(5)">★</span>
+            </div>
+            <div class="review-inputs">
+                <input type="text" id="reviewName" placeholder="Your Name">
+                <input type="email" id="reviewEmail" placeholder="Your Email">
+            </div>
+            <textarea class="review-textarea" id="reviewComment" placeholder="Share your experience with this product..."></textarea>
+            <button class="submit-review-btn" onclick="submitReview()">Submit Review</button>
+        </div>
+
+        <div id="reviewsList"></div>
+    </div>
+
+    <div class="similar-section">
+        <h3>🔄 Similar Products</h3>
+        <div class="similar-grid" id="similarGrid"></div>
+    </div>
+</div>
+
+<script>
+    const productImages = {
+        electronics: ['https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400','https://images.unsplash.com/photo-1588423771073-b8903fead714?w=400','https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400','https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400'],
+        fashion: ['https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400','https://images.unsplash.com/photo-1542272604-787c3835535d?w=400','https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400','https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400'],
+        home: ['https://images.unsplash.com/photo-1585515320310-259814833e62?w=400','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400','https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400','https://images.unsplash.com/photo-1567538096621-38d2284b23ff?w=400'],
+        beauty: ['https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400','https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400','https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400','https://images.unsplash.com/photo-1583241475880-083f84372725?w=400'],
+        sports: ['https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400','https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400','https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400','https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400'],
+        books: ['https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400','https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400','https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400','https://images.unsplash.com/photo-1524578271613-d550eacf6090?w=400']
+    };
+    const defaultImgs = ['https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400','https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400','https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400','https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400'];
+
+    function getImages(p) {
+        const imgs = productImages[p.category] || defaultImgs;
+        if (p.imageUrl && p.imageUrl.length > 5) return [p.imageUrl, ...imgs.slice(0,3)];
+        return imgs;
+    }
+
+    let currentProduct = null;
+    let selectedRating = 0;
+    let quantity = 1;
+
+    async function loadProduct() {
+        const id = new URLSearchParams(window.location.search).get('id');
+        if (!id) { window.location.href = '/'; return; }
+        const res = await fetch('/api/products/' + id);
+        currentProduct = await res.json();
+        renderProduct(currentProduct);
+        loadSimilar(currentProduct.category, id);
+        loadReviews(id);
+    }
+
+    function renderProduct(p) {
+        const imgs = getImages(p);
+        const savings = p.originalPrice - p.price;
+        document.title = p.name + ' - ShopKart';
+        document.getElementById('productDetail').innerHTML = `
+            <div class="product-image-section">
+                <div class="main-image"><img id="mainImg" src="${imgs[0]}" alt="${p.name}" onerror="this.src='${defaultImgs[0]}'"></div>
+                <div class="thumbnail-row">
+                    ${imgs.map((img,i) => `<div class="thumbnail ${i===0?'active':''}" onclick="changeImage('${img}',this)"><img src="${img}" onerror="this.src='${defaultImgs[0]}'"></div>`).join('')}
+                </div>
+            </div>
+            <div class="product-info">
+                <div class="product-brand">${p.category}</div>
+                <div class="product-title">${p.name}</div>
+                <div class="rating-row">
+                    <span class="rating-badge">${p.rating} ★</span>
+                    <span class="rating-count">2,345 Ratings</span>
+                </div>
+                <div class="price-section">
+                    <div>
+                        <span class="current-price">₹${p.price.toLocaleString('en-IN')}</span>
+                        <span class="original-price">₹${p.originalPrice.toLocaleString('en-IN')}</span>
+                        <span class="discount-badge">${p.discount}% off</span>
+                    </div>
+                    <div class="savings">You save ₹${savings.toLocaleString('en-IN')}!</div>
+                </div>
+                <div>
+                    <b style="font-size:15px;">🏷️ Available Offers</b>
+                    <div class="offer-item" style="margin-top:10px;">💳 <span><b>Bank Offer</b> 10% off on HDFC Cards</span></div>
+                    <div class="offer-item">🎁 <span><b>Special Price</b> Extra 5% off</span></div>
+                    <div class="offer-item">🚚 <span><b>Free Delivery</b> on orders above ₹499</span></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:16px;">
+                    <label style="font-size:14px;font-weight:bold;">Quantity:</label>
+                    <div class="qty-ctrl">
+                        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+                        <span class="qty-val" id="qtyVal">1</span>
+                        <button class="qty-btn" onclick="changeQty(1)">+</button>
+                    </div>
+                </div>
+                <div class="action-btns">
+                    <button class="cart-btn" onclick="addToCart()">🛒 ADD TO CART</button>
+                    <button class="buy-btn" onclick="buyNow()">⚡ BUY NOW</button>
+                </div>
+                <div class="delivery-section">
+                    <h4>📦 Delivery & Services</h4>
+                    <div class="delivery-item">🚚 Free delivery by Tomorrow</div>
+                    <div class="delivery-item">↩️ 7 Days Replacement Policy</div>
+                    <div class="delivery-item">✅ In Stock (${p.stock} units left)</div>
+                </div>
+            </div>
+        `;
+        document.getElementById('descriptionText').innerHTML = `
+            <p style="font-size:14px;line-height:1.8;">${p.description}</p><br>
+            <p style="font-size:14px;">Category: <b>${p.category}</b> &nbsp;|&nbsp; Rating: <b>${p.rating}/5</b> &nbsp;|&nbsp; Stock: <b>${p.stock} units</b></p>
+        `;
+    }
+
+    function changeImage(src, el) {
+        document.getElementById('mainImg').src = src;
+        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    async function loadSimilar(category, currentId) {
+        const res = await fetch('/api/products/category/' + category);
+        const products = await res.json();
+        const similar = products.filter(p => p.id != currentId).slice(0, 6);
+        if (similar.length === 0) { document.getElementById('similarGrid').innerHTML = '<p style="color:#878787;">No similar products</p>'; return; }
+        document.getElementById('similarGrid').innerHTML = similar.map(p => {
+            const img = getImages(p)[0];
+            return `<div class="similar-card" onclick="window.location.href='/product.html?id=${p.id}'">
+                <img src="${img}" onerror="this.src='${defaultImgs[0]}'">
+                <div class="similar-name">${p.name.substring(0,30)}...</div>
+                <div class="similar-price">₹${p.price.toLocaleString('en-IN')}</div>
+            </div>`;
+        }).join('');
+    }
+
+    async function loadReviews(productId) {
+        const res = await fetch('/api/reviews/product/' + productId);
+        const reviews = await res.json();
+        renderReviews(reviews);
+    }
+
+    function renderReviews(reviews) {
+        if (reviews.length === 0) {
+            document.getElementById('avgRating').textContent = '0';
+            document.getElementById('avgStars').textContent = '☆☆☆☆☆';
+            document.getElementById('totalReviews').textContent = '0 reviews';
+            document.getElementById('ratingBars').innerHTML = '';
+            document.getElementById('reviewsList').innerHTML = '<p style="color:#878787;padding:16px 0;">No reviews yet. Be the first to review!</p>';
+            return;
+        }
+        const avg = (reviews.reduce((s,r) => s + r.rating, 0) / reviews.length).toFixed(1);
+        document.getElementById('avgRating').textContent = avg;
+        document.getElementById('avgStars').textContent = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+        document.getElementById('totalReviews').textContent = reviews.length + ' reviews';
+
+        const bars = document.getElementById('ratingBars');
+        bars.innerHTML = [5,4,3,2,1].map(star => {
+            const count = reviews.filter(r => r.rating === star).length;
+            const pct = reviews.length ? (count/reviews.length*100).toFixed(0) : 0;
+            return `<div class="rating-bar-row">
+                <span>${star}★</span>
+                <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+                <span class="bar-count">${count}</span>
+            </div>`;
+        }).join('');
+
+        document.getElementById('reviewsList').innerHTML = reviews.map(r => `
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="reviewer-avatar">${r.customerName.charAt(0).toUpperCase()}</div>
+                    <div>
+                        <div class="reviewer-name">${r.customerName}</div>
+                        <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+                    </div>
+                    <div class="review-date">${new Date(r.createdAt).toLocaleDateString('en-IN')}</div>
+                </div>
+                <div class="review-comment">${r.comment}</div>
+                <div class="verified">✓ Verified Purchase</div>
+            </div>
+        `).join('');
+    }
+
+    function selectStar(num) {
+        selectedRating = num;
+        document.querySelectorAll('.star-btn').forEach((s, i) => s.classList.toggle('active', i < num));
+    }
+
+    async function submitReview() {
+        const name = document.getElementById('reviewName').value.trim();
+        const email = document.getElementById('reviewEmail').value.trim();
+        const comment = document.getElementById('reviewComment').value.trim();
+        if (!name || !email || !comment || selectedRating === 0) {
+            showToast('❌ Please fill all fields and select rating!');
+            return;
+        }
+        const review = { productId: currentProduct.id, customerName: name, customerEmail: email, rating: selectedRating, comment };
+        const res = await fetch('/api/reviews', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(review)
+        });
+        if (res.ok) {
+            showToast('✅ Review submitted!');
+            document.getElementById('reviewName').value = '';
+            document.getElementById('reviewEmail').value = '';
+            document.getElementById('reviewComment').value = '';
+            selectedRating = 0;
+            document.querySelectorAll('.star-btn').forEach(s => s.classList.remove('active'));
+            loadReviews(currentProduct.id);
+        }
+    }
+
+    function changeQty(delta) {
+        quantity = Math.max(1, quantity + delta);
+        document.getElementById('qtyVal').textContent = quantity;
+    }
+
+    function addToCart() {
+        const imgs = getImages(currentProduct);
+        let cart = JSON.parse(localStorage.getItem('shopkartCart') || '[]');
+        for(let i = 0; i < quantity; i++) {
+            cart.push({ id: currentProduct.id, name: currentProduct.name, price: currentProduct.price, category: currentProduct.category, imageUrl: imgs[0] });
+        }
+        localStorage.setItem('shopkartCart', JSON.stringify(cart));
+        showToast('🛒 ' + currentProduct.name + ' added to cart!');
+    }
+
+    function buyNow() {
+        addToCart();
+        setTimeout(() => window.location.href = '/checkout.html', 500);
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    loadProduct();
+</script>
+</body>
+</html>

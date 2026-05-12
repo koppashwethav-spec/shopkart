@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/mobile.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - ShopKart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f1f3f6; }
+        .navbar { background: #2874f0; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .logo { color: white; font-size: 24px; font-weight: bold; }
+        .logo span { color: #ffe082; }
+        .nav-right { display: flex; gap: 12px; }
+        .nav-btn { background: white; color: #2874f0; border: none; padding: 8px 16px; cursor: pointer; font-weight: bold; border-radius: 4px; }
+        .nav-btn.red { background: #ff6161; color: white; }
+        .container { max-width: 1200px; margin: 24px auto; padding: 0 16px; }
+
+        /* TABS */
+        .tabs { display: flex; gap: 0; background: white; border-radius: 8px 8px 0 0; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 0; }
+        .tab { flex: 1; padding: 14px; background: none; border: none; font-size: 14px; font-weight: bold; cursor: pointer; color: #878787; border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .tab:hover { background: #f5f8ff; color: #2874f0; }
+        .tab.active { color: #2874f0; border-bottom-color: #2874f0; background: #f5f8ff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* STATS */
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; margin-top: 16px; }
+        .stat-card { background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #2874f0; }
+        .stat-card:nth-child(2) { border-left-color: #388e3c; }
+        .stat-card:nth-child(3) { border-left-color: #ff9f00; }
+        .stat-card:nth-child(4) { border-left-color: #ff6161; }
+        .stat-icon { font-size: 32px; margin-bottom: 8px; }
+        .stat-value { font-size: 28px; font-weight: bold; color: #212121; }
+        .stat-label { font-size: 13px; color: #878787; margin-top: 4px; }
+
+        /* CHARTS */
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .chart-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .chart-card h3 { font-size: 16px; font-weight: bold; margin-bottom: 16px; color: #212121; }
+        .chart-card canvas { max-height: 250px; }
+        .chart-full { grid-column: 1 / -1; }
+
+        /* TABLE */
+        .table-section { background: white; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; }
+        .table-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .table-head h2 { font-size: 18px; font-weight: bold; }
+        .search-input { padding: 8px 14px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 14px; outline: none; width: 250px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f1f3f6; padding: 12px 16px; text-align: left; font-size: 13px; color: #878787; }
+        td { padding: 12px 16px; border-bottom: 1px solid #f1f3f6; font-size: 13px; vertical-align: middle; }
+        tr:hover td { background: #fafafa; }
+        .product-img-thumb { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background: #f1f3f6; }
+        .category-badge { background: #e3f2fd; color: #1565c0; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .stock-badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .stock-ok { background: #e8f5e9; color: #2e7d32; }
+        .stock-low { background: #fff3e0; color: #e65100; }
+        .edit-btn { background: #fff3e0; color: #e65100; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; margin-right: 6px; }
+        .delete-btn { background: #ffebee; color: #c62828; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .edit-btn:hover { background: #e65100; color: white; }
+        .delete-btn:hover { background: #c62828; color: white; }
+
+        /* FORM */
+        .form-section { background: white; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; }
+        .form-section h2 { font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label { font-size: 13px; font-weight: bold; }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 14px; outline: none; font-family: Arial; }
+        .form-group input:focus, .form-group select:focus { border-color: #2874f0; }
+        .form-group textarea { height: 80px; resize: none; }
+        .form-btns { display: flex; gap: 12px; margin-top: 20px; }
+        .submit-btn { background: #2874f0; color: white; border: none; padding: 12px 32px; font-size: 15px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .clear-btn { background: #f1f3f6; color: #212121; border: none; padding: 12px 32px; font-size: 15px; cursor: pointer; border-radius: 4px; }
+
+        /* ORDER STATUS */
+        .status-select { padding: 4px 8px; border-radius: 4px; border: 1px solid #e0e0e0; font-size: 12px; cursor: pointer; }
+        .status-PENDING { color: #e65100; background: #fff3e0; }
+        .status-CONFIRMED { color: #1565c0; background: #e3f2fd; }
+        .status-SHIPPED { color: #6a1b9a; background: #f3e5f5; }
+        .status-DELIVERED { color: #2e7d32; background: #e8f5e9; }
+        .status-CANCELLED { color: #c62828; background: #ffebee; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: white; border-radius: 8px; padding: 24px; width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal h3 { font-size: 18px; font-weight: bold; margin-bottom: 16px; }
+        .modal-btns { display: flex; gap: 12px; margin-top: 16px; }
+        .save-btn { flex: 1; background: #2874f0; color: white; border: none; padding: 12px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .cancel-btn { flex: 1; background: #f1f3f6; border: none; padding: 12px; font-size: 14px; cursor: pointer; border-radius: 4px; }
+
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #323232; color: white; padding: 12px 24px; border-radius: 4px; font-size: 14px; z-index: 300; transition: transform 0.3s; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 700px) { .stats { grid-template-columns: 1fr 1fr; } .charts-grid { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+        <h3>✏️ Edit Product</h3>
+        <input type="hidden" id="editId">
+        <div class="form-group" style="margin-bottom:12px;"><label>Name</label><input type="text" id="editName"></div>
+        <div class="form-group" style="margin-bottom:12px;"><label>Description</label><textarea id="editDescription"></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div class="form-group"><label>Price (₹)</label><input type="number" id="editPrice"></div>
+            <div class="form-group"><label>Original Price (₹)</label><input type="number" id="editOriginalPrice"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div class="form-group"><label>Stock</label><input type="number" id="editStock"></div>
+            <div class="form-group"><label>Rating</label><input type="number" id="editRating" step="0.1" min="0" max="5"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px;"><label>Image URL</label><input type="text" id="editImageUrl"></div>
+        <div class="modal-btns">
+            <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+            <button class="save-btn" onclick="saveEdit()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="logo">Shop<span>Kart</span> <span style="font-size:13px;color:rgba(255,255,255,0.7);font-weight:normal;">Admin</span></div>
+    <div class="nav-right">
+        <button class="nav-btn" onclick="window.location.href='/'">🛍️ View Store</button>
+        <button class="nav-btn red" onclick="showToast('Logged out!')">Logout</button>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
+        <button class="tab" onclick="showTab('products')">📦 Products</button>
+        <button class="tab" onclick="showTab('orders')">📋 Orders</button>
+        <button class="tab" onclick="showTab('users')">👤 Users</button>
+        <button class="tab" onclick="showTab('addProduct')">➕ Add Product</button>
+    </div>
+
+    <!-- DASHBOARD TAB -->
+    <div class="tab-content active" id="tab-dashboard">
+        <div class="stats" id="stats">
+            <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-value" id="totalProducts">0</div><div class="stat-label">Total Products</div></div>
+            <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-value" id="totalOrders">0</div><div class="stat-label">Total Orders</div></div>
+            <div class="stat-card"><div class="stat-icon">👤</div><div class="stat-value" id="totalUsers">0</div><div class="stat-label">Total Users</div></div>
+            <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-value" id="totalRevenue">₹0</div><div class="stat-label">Total Revenue</div></div>
+        </div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>📱 Products by Category</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>📋 Orders by Status</h3>
+                <canvas id="orderStatusChart"></canvas>
+            </div>
+            <div class="chart-card chart-full">
+                <h3>💰 Revenue by Category</h3>
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCTS TAB -->
+    <div class="tab-content" id="tab-products">
+        <div class="table-section" style="margin-top:16px;">
+            <div class="table-head">
+                <h2>📦 All Products</h2>
+                <input class="search-input" type="text" placeholder="🔍 Search..." oninput="searchProducts(this.value)">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Image</th><th>Name</th><th>Category</th>
+                        <th>Price</th><th>Discount</th><th>Stock</th>
+                        <th>Rating</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div class="tab-content" id="tab-orders">
+        <div class="table-section" style="margin-top:16px;">
+            <div class="table-head">
+                <h2>📋 All Orders</h2>
+                <span id="ordersCount" style="font-size:13px;color:#878787;"></span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th><th>Customer</th><th>Phone</th>
+                        <th>Products</th><th>Total</th><th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div class="tab-content" id="tab-users">
+        <div class="table-section" style="margin-top:16px;">
+            <div class="table-head"><h2>👤 All Users</h2></div>
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th></tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ADD PRODUCT TAB -->
+    <div class="tab-content" id="tab-addProduct">
+        <div class="form-section" style="margin-top:16px;">
+            <h2>➕ Add New Product</h2>
+            <div class="form-grid">
+                <div class="form-group"><label>Product Name *</label><input type="text" id="name" placeholder="e.g. Samsung Galaxy S24"></div>
+                <div class="form-group"><label>Category *</label>
+                    <select id="category">
+                        <option value="">Select Category</option>
+                        <option value="electronics">📱 Electronics</option>
+                        <option value="fashion">👗 Fashion</option>
+                        <option value="home">🏡 Home</option>
+                        <option value="beauty">💄 Beauty</option>
+                        <option value="sports">⚽ Sports</option>
+                        <option value="books">📚 Books</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Price (₹) *</label><input type="number" id="price" placeholder="e.g. 79999"></div>
+                <div class="form-group"><label>Original Price (₹) *</label><input type="number" id="originalPrice" placeholder="e.g. 109999"></div>
+                <div class="form-group"><label>Stock *</label><input type="number" id="stock" placeholder="e.g. 10"></div>
+                <div class="form-group"><label>Rating</label><input type="number" id="rating" step="0.1" min="0" max="5" placeholder="e.g. 4.5"></div>
+                <div class="form-group full"><label>Description *</label><textarea id="description" placeholder="Product description..."></textarea></div>
+                <div class="form-group full"><label>Image URL</label><input type="text" id="imageUrl" placeholder="https://..."></div>
+            </div>
+            <div class="form-btns">
+                <button class="submit-btn" onclick="addProduct()">➕ Add Product</button>
+                <button class="clear-btn" onclick="clearForm()">🗑️ Clear</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allProducts = [];
+    let allOrders = [];
+    let allUsers = [];
+
+    const images = {
+        electronics: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=100',
+        fashion: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100',
+        home: 'https://images.unsplash.com/photo-1585515320310-259814833e62?w=100',
+        beauty: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=100',
+        sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=100',
+        books: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=100',
+        default: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=100'
+    };
+
+    function showTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    async function loadAll() {
+        const [pRes, oRes, uRes] = await Promise.all([
+            fetch('/api/products'),
+            fetch('/api/orders'),
+            fetch('/api/users')
+        ]);
+        allProducts = await pRes.json();
+        allOrders = await oRes.json();
+        allUsers = await uRes.json();
+        updateStats();
+        renderCharts();
+        renderProductsTable(allProducts);
+        renderOrdersTable(allOrders);
+        renderUsersTable(allUsers);
+    }
+
+    function updateStats() {
+        document.getElementById('totalProducts').textContent = allProducts.length;
+        document.getElementById('totalOrders').textContent = allOrders.length;
+        document.getElementById('totalUsers').textContent = allUsers.length;
+        const revenue = allOrders.reduce((s, o) => s + o.totalAmount, 0);
+        document.getElementById('totalRevenue').textContent = '₹' + (revenue/1000).toFixed(0) + 'K';
+    }
+
+    function renderCharts() {
+        // Category Chart
+        const categories = ['electronics','fashion','home','beauty','sports','books'];
+        const catCounts = categories.map(c => allProducts.filter(p => p.category === c).length);
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Electronics','Fashion','Home','Beauty','Sports','Books'],
+                datasets: [{ data: catCounts, backgroundColor: ['#2874f0','#ff9f00','#388e3c','#e91e63','#9c27b0','#ff5722'], borderWidth: 2 }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        // Order Status Chart
+        const statuses = ['PENDING','CONFIRMED','SHIPPED','DELIVERED','CANCELLED'];
+        const statusCounts = statuses.map(s => allOrders.filter(o => o.status === s).length);
+        new Chart(document.getElementById('orderStatusChart'), {
+            type: 'bar',
+            data: {
+                labels: statuses,
+                datasets: [{ label: 'Orders', data: statusCounts, backgroundColor: ['#ff9f00','#2874f0','#9c27b0','#388e3c','#ff5722'] }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+
+        // Revenue Chart
+        const catRevenue = categories.map(c => {
+            const catOrders = allOrders.filter(o => allProducts.some(p => p.category === c && o.productNames.includes(p.name)));
+            return catOrders.reduce((s, o) => s + o.totalAmount, 0);
+        });
+        new Chart(document.getElementById('revenueChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Electronics','Fashion','Home','Beauty','Sports','Books'],
+                datasets: [{ label: 'Revenue (₹)', data: catRevenue, backgroundColor: '#2874f0', borderRadius: 6 }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+    }
+
+    function getImg(p) {
+        if (p.imageUrl && p.imageUrl.length > 5) return p.imageUrl;
+        return images[p.category] || images.default;
+    }
+
+    function renderProductsTable(products) {
+        document.getElementById('productsTableBody').innerHTML = products.length === 0
+            ? '<tr><td colspan="8" style="text-align:center;padding:40px;color:#878787;">No products!</td></tr>'
+            : products.map(p => `
+            <tr>
+                <td><img class="product-img-thumb" src="${getImg(p)}" onerror="this.src='${images.default}'"></td>
+                <td style="max-width:200px;font-weight:500;">${p.name}</td>
+                <td><span class="category-badge">${p.category}</span></td>
+                <td><b>₹${p.price.toLocaleString('en-IN')}</b></td>
+                <td style="color:#388e3c;font-weight:bold;">${p.discount}% off</td>
+                <td><span class="stock-badge ${p.stock < 10 ? 'stock-low':'stock-ok'}">${p.stock}</span></td>
+                <td>${p.rating}★</td>
+                <td>
+                    <button class="edit-btn" onclick="openEdit(${p.id})">✏️</button>
+                    <button class="delete-btn" onclick="deleteProduct(${p.id})">🗑️</button>
+                </td>
+            </tr>`).join('');
+    }
+
+    function renderOrdersTable(orders) {
+        document.getElementById('ordersCount').textContent = orders.length + ' orders';
+        document.getElementById('ordersTableBody').innerHTML = orders.length === 0
+            ? '<tr><td colspan="7" style="text-align:center;padding:40px;color:#878787;">No orders yet!</td></tr>'
+            : orders.map(o => `
+            <tr>
+                <td><b>#SK${String(o.id).padStart(5,'0')}</b></td>
+                <td>${o.customerName}</td>
+                <td>${o.customerPhone}</td>
+                <td style="max-width:200px;font-size:12px;">${o.productNames.substring(0,50)}...</td>
+                <td><b>₹${o.totalAmount.toLocaleString('en-IN')}</b></td>
+                <td>
+                    <select class="status-select status-${o.status}" onchange="updateOrderStatus(${o.id},this.value,this)">
+                        <option ${o.status==='PENDING'?'selected':''}>PENDING</option>
+                        <option ${o.status==='CONFIRMED'?'selected':''}>CONFIRMED</option>
+                        <option ${o.status==='SHIPPED'?'selected':''}>SHIPPED</option>
+                        <option ${o.status==='DELIVERED'?'selected':''}>DELIVERED</option>
+                        <option ${o.status==='CANCELLED'?'selected':''}>CANCELLED</option>
+                    </select>
+                </td>
+                <td style="font-size:12px;">${new Date(o.orderDate).toLocaleDateString('en-IN')}</td>
+            </tr>`).join('');
+    }
+
+    function renderUsersTable(users) {
+        document.getElementById('usersTableBody').innerHTML = users.length === 0
+            ? '<tr><td colspan="6" style="text-align:center;padding:40px;color:#878787;">No users yet!</td></tr>'
+            : users.map(u => `
+            <tr>
+                <td>${u.id}</td>
+                <td><b>${u.fullName}</b></td>
+                <td>${u.email}</td>
+                <td>${u.phone || '-'}</td>
+                <td><span class="category-badge">${u.role}</span></td>
+                <td style="font-size:12px;">${new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
+            </tr>`).join('');
+    }
+
+    function searchProducts(q) {
+        renderProductsTable(allProducts.filter(p => p.name.toLowerCase().includes(q.toLowerCase())));
+    }
+
+    async function addProduct() {
+        const name = document.getElementById('name').value.trim();
+        const category = document.getElementById('category').value;
+        const price = parseFloat(document.getElementById('price').value);
+        const originalPrice = parseFloat(document.getElementById('originalPrice').value);
+        const stock = parseInt(document.getElementById('stock').value);
+        const rating = parseFloat(document.getElementById('rating').value) || 4.0;
+        const description = document.getElementById('description').value.trim();
+        const imageUrl = document.getElementById('imageUrl').value.trim();
+        if (!name || !category || !price || !originalPrice || !stock || !description) {
+            showToast('❌ Fill all required fields!'); return;
+        }
+        const discount = Math.round(((originalPrice - price) / originalPrice) * 100);
+        const res = await fetch('/api/products', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, category, price, originalPrice, discount, stock, rating, description, imageUrl })
+        });
+        if (res.ok) { showToast('✅ Product added!'); clearForm(); loadAll(); }
+        else showToast('❌ Failed!');
+    }
+
+    function clearForm() {
+        ['name','category','price','originalPrice','stock','rating','description','imageUrl'].forEach(id => document.getElementById(id).value = '');
+    }
+
+    function openEdit(id) {
+        const p = allProducts.find(x => x.id === id);
+        if (!p) return;
+        document.getElementById('editId').value = p.id;
+        document.getElementById('editName').value = p.name;
+        document.getElementById('editDescription').value = p.description;
+        document.getElementById('editPrice').value = p.price;
+        document.getElementById('editOriginalPrice').value = p.originalPrice;
+        document.getElementById('editStock').value = p.stock;
+        document.getElementById('editRating').value = p.rating;
+        document.getElementById('editImageUrl').value = p.imageUrl || '';
+        document.getElementById('editModal').classList.add('open');
+    }
+
+    function closeModal() { document.getElementById('editModal').classList.remove('open'); }
+
+    async function saveEdit() {
+        const id = document.getElementById('editId').value;
+        const p = allProducts.find(x => x.id == id);
+        const price = parseFloat(document.getElementById('editPrice').value);
+        const originalPrice = parseFloat(document.getElementById('editOriginalPrice').value);
+        const updated = { ...p, name: document.getElementById('editName').value, description: document.getElementById('editDescription').value, price, originalPrice, discount: Math.round(((originalPrice-price)/originalPrice)*100), stock: parseInt(document.getElementById('editStock').value), rating: parseFloat(document.getElementById('editRating').value), imageUrl: document.getElementById('editImageUrl').value };
+        const res = await fetch('/api/products/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) });
+        if (res.ok) { showToast('✅ Updated!'); closeModal(); loadAll(); }
+        else showToast('❌ Failed!');
+    }
+
+    async function deleteProduct(id) {
+        if (!confirm('Delete this product?')) return;
+        const res = await fetch('/api/products/' + id, { method: 'DELETE' });
+        if (res.ok) { showToast('🗑️ Deleted!'); loadAll(); }
+    }
+
+    async function updateOrderStatus(id, status, el) {
+        el.className = 'status-select status-' + status;
+        await fetch('/api/orders/' + id + '/status?status=' + status, { method: 'PUT' });
+        showToast('✅ Status → ' + status);
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    loadAll();
+</script>
+</body>
+</html>
