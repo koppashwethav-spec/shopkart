@@ -1,10 +1,8 @@
 # 🛒 ShopKart - E-Commerce Web Application
 
-A full-stack Flipkart-style e-commerce platform built with **Spring Boot**, **PostgreSQL**, and **HTML/CSS/JS**.
+A full-stack Flipkart-style e-commerce platform built with Spring Boot, PostgreSQL, and HTML/CSS/JS.
 
 🔗 **Live Demo:** https://shopkart-etg6.onrender.com
-
----
 
 ## 📸 Features
 
@@ -17,8 +15,6 @@ A full-stack Flipkart-style e-commerce platform built with **Spring Boot**, **Po
 - 👨‍💼 Admin dashboard with charts, product and order management
 - 📱 Fully responsive mobile design
 
----
-
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
@@ -28,8 +24,6 @@ A full-stack Flipkart-style e-commerce platform built with **Spring Boot**, **Po
 | Frontend | HTML, CSS, JavaScript |
 | ORM | Spring Data JPA / Hibernate |
 | Deployment | Render.com (Docker) |
-
----
 
 ## 🚀 API Endpoints
 
@@ -46,8 +40,6 @@ A full-stack Flipkart-style e-commerce platform built with **Spring Boot**, **Po
 | POST | /api/users/login | Login user |
 | POST | /api/reviews | Add review |
 
----
-
 ## 🏃 Run Locally
 
 ```bash
@@ -58,9 +50,8 @@ cd shopkart
 
 Open browser: `http://localhost:8081`
 
----
-
 ## 👩‍💻 Developer
 
 **Shwetha V Koppa**
-- GitHub: [@koppashwethav-spec](https://github.com/koppashwethav-spec)
+
+GitHub: [@koppashwethav-spec](https://github.com/koppashwethav-spec)
